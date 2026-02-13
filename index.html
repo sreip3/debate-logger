@@ -323,8 +323,7 @@
         <button id="deleteCurrentBtn" style="background:none; color:var(--danger); border:none; margin-top:5px; font-size: 14px; font-weight:700;" onclick="deleteThisSession()">Delete Info</button>
       </div>
       <div class="grid">
-        <div><label>Date</label><input type="date" id="recDate" oninput="autoSave()"></div>
-        <div><label>Folder</label><select id="folderSelect" onchange="checkFolder(); autoSave();"><option value="">Loading...</option></select></div>
+        <div style="grid-column: span 2;"><label>Date</label><input type="date" id="recDate" oninput="autoSave()"></div>
       </div>
       <label>Motion</label><textarea id="motion" placeholder="Enter motion..." oninput="autoSave()"></textarea>
       <div class="grid">
@@ -380,6 +379,7 @@
         '"Roboto Mono", monospace'
       ];
       let fontIndex = 0;
+      let defaultTargetFolderId = null;
 
       let currentRow = null, currentFileUrl = null, sessionSpeechCode = "", activeMediaTarget = "";
 
@@ -450,19 +450,11 @@
         resetTimer();
       }
 
-      function loadMainAppFolders() {
-        google.script.run.withSuccessHandler(folders => {
-            const select = document.getElementById('folderSelect'); 
-            select.innerHTML = '<option value="">-- Choose --</option>';
-            google.script.run.withSuccessHandler(defaultId => {
-              folders.forEach(f => { 
-                let opt = new Option(f.name, f.id); 
-                if (f.id === defaultId) opt.selected = true; 
-                select.add(opt); 
-              });
-              checkFolder();
-            }).getTargetFolderId();
-          }).getUserFolders();
+      function initializeFolders() {
+        google.script.run.withSuccessHandler(id => {
+          defaultTargetFolderId = id;
+          if(id) document.getElementById('startBtn').disabled = false;
+        }).getTargetFolderId();
       }
 
       window.onload = () => {
@@ -483,7 +475,7 @@
               document.getElementById('setupOverlay').style.display = 'flex';
               loadSetupFolders();
             } else {
-              loadMainAppFolders();
+              initializeFolders();
             }
           }).getSetupStatus();
         }
@@ -516,7 +508,7 @@
           document.getElementById('setupOverlay').style.display = 'none';
           document.getElementById('finishSetupBtn').disabled = false;
           document.getElementById('status').innerText = "Setup Complete. Initializing...";
-          loadMainAppFolders(); 
+          initializeFolders(); 
         }).saveSetup(config);
       }
 
@@ -602,7 +594,7 @@
             document.getElementById('status').innerText = "✅ Saved to Folder";
             saveMetadata(); 
           } else { document.getElementById('status').innerText = "❌ Upload Failed"; }
-        }).uploadImageToFolder(base64, mediaNaming, document.getElementById('folderSelect').value, type);
+        }).uploadImageToFolder(base64, mediaNaming, defaultTargetFolderId, type);
       }
 
       function startTimer() {
@@ -658,7 +650,7 @@
               document.getElementById('discardBtn').style.display = "none";
               document.getElementById('newSessionBtn').style.display = "block";
               document.getElementById('deleteCurrentBtn').style.display = "block";
-            }).saveAudioFile(r.result.split(',')[1], null, document.getElementById('folderSelect').value, getFormData(), currentRow);
+            }).saveAudioFile(r.result.split(',')[1], null, defaultTargetFolderId, getFormData(), currentRow);
           };
           r.readAsDataURL(blob);
         });
@@ -784,7 +776,6 @@
       }
 
       function toggleTimerPause() { timerIsPaused = !timerIsPaused; document.getElementById('pauseBtn').innerText = timerIsPaused ? "Resume" : "Pause"; }
-      function checkFolder() { document.getElementById('startBtn').disabled = !document.getElementById('folderSelect').value; }
       function adjustLimit(n) { targetSeconds += n; updateUI(); }
       function updateTargetTime() { targetSeconds = (document.getElementById('style').value === "WSDC") ? 495 : 435; updateUI(); }
       function softReset() {
