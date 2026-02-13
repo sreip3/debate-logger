@@ -15,17 +15,66 @@ function showSidebar() {
   SpreadsheetApp.getUi().showSidebar(html);
 }
 
+// --- SETUP LOGIC ---
+function getSetupStatus() {
+  var props = PropertiesService.getScriptProperties();
+  return {
+    isConfigured: !!(props.getProperty('TARGET_FOLDER') && props.getProperty('FEEDBACK_FOLDER') && props.getProperty('NOTES_FOLDER'))
+  };
+}
+
+function saveSetup(config) {
+  var props = PropertiesService.getScriptProperties();
+  props.setProperty('TARGET_FOLDER', config.target);
+  props.setProperty('FEEDBACK_FOLDER', config.feedback);
+  props.setProperty('NOTES_FOLDER', config.notes);
+  return { success: true };
+}
+
+// --- APPEARANCE PERSISTENCE ---
+function saveAppearance(settings) {
+  var props = PropertiesService.getScriptProperties();
+  props.setProperty('THEME', settings.theme);
+  props.setProperty('FONT_INDEX', settings.fontIndex);
+  return { success: true };
+}
+
+function getAppearance() {
+  var props = PropertiesService.getScriptProperties();
+  return {
+    theme: props.getProperty('THEME') || 'light',
+    fontIndex: props.getProperty('FONT_INDEX') || '0'
+  };
+}
+
+function clearSetupProperties() {
+  var props = PropertiesService.getScriptProperties();
+  props.deleteProperty('TARGET_FOLDER');
+  props.deleteProperty('FEEDBACK_FOLDER');
+  props.deleteProperty('NOTES_FOLDER');
+  props.deleteProperty('THEME');
+  props.deleteProperty('FONT_INDEX');
+  return { success: true };
+}
+
+// --- UPDATED FOLDER GETTERS ---
 function getTargetFolderId() {
+  var id = PropertiesService.getScriptProperties().getProperty('TARGET_FOLDER');
+  if (id) return id;
   var folders = DriveApp.getFoldersByName("Speech Recordings");
   return folders.hasNext() ? folders.next().getId() : null;
 }
 
 function getFeedbackFolderId() {
+  var id = PropertiesService.getScriptProperties().getProperty('FEEDBACK_FOLDER');
+  if (id) return id;
   var folders = DriveApp.getFoldersByName("Feedback Recordings");
   return folders.hasNext() ? folders.next().getId() : null;
 }
 
 function getNotesRootFolderId() {
+  var id = PropertiesService.getScriptProperties().getProperty('NOTES_FOLDER');
+  if (id) return id;
   var folders = DriveApp.getFoldersByName("Notes Pictures");
   return folders.hasNext() ? folders.next().getId() : null;
 }
@@ -179,12 +228,10 @@ function uploadImageToFolder(base64Data, metadata, folderId, type) {
     var typeTag = (type === 'notes') ? "Notes" : "Feedback";
     var speechCodeTag = "[" + metadata.speechCode + "]";
     
-    // Smart Lookup: Find ANY existing folder for this session code in the correct root
     var rootFolderId = (type === 'notes') ? getNotesRootFolderId() : getFeedbackFolderId();
     if (!rootFolderId) return { success: false, error: "Root folder not found." };
     var rootFolder = DriveApp.getFolderById(rootFolderId);
     
-    // Search folders inside the specific root that contain the speech code
     var folderSearch = rootFolder.getFolders();
     var targetFolder = null;
     while (folderSearch.hasNext()) {
@@ -195,7 +242,6 @@ function uploadImageToFolder(base64Data, metadata, folderId, type) {
       }
     }
     
-    // If not found, create it using current metadata
     if (!targetFolder) {
       var newFolderName = speechCodeTag + "." + typeTag + "." + metadata.style + "." + metadata.position + "." + fullMonthName + "." + dayNum + "." + yearNum;
       targetFolder = rootFolder.createFolder(newFolderName);
@@ -205,7 +251,6 @@ function uploadImageToFolder(base64Data, metadata, folderId, type) {
     var existingFiles = targetFolder.getFiles();
     while (existingFiles.hasNext()) { existingFiles.next(); count++; }
     
-    // Use the folder's current name as the base for the photo filename to keep it consistent
     var finalFileName = targetFolder.getName() + ".Photo " + (count + 1) + ".jpg";
     var blob = Utilities.newBlob(Utilities.base64Decode(base64Data), 'image/jpeg', finalFileName);
     var file = targetFolder.createFile(blob);
