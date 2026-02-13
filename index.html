@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Importing Comic Neue from Google Fonts for cross-platform support (especially iOS Safari) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/mic-recorder-to-mp3@2.2.2/dist/index.min.js"></script>
+    <style>
+      :root { 
+        --bg: #ffffff; 
+        --text: #000000;
+        --secondary-text: #86868b;
+        --accent: #0071e3;
+        --danger: #ff3b30;
+        --success: #34c759;
+        --card-bg: #f5f5f7;
+        --input-border: #d2d2d7;
+        --btn-secondary: #e8e8ed;
+        /* Comic Sans fallback stack for iOS and other systems */
+        --font-stack: "Comic Neue", "Chalkboard SE", "Comic Sans MS", "Comic Sans", cursive;
+      }
+
+      [data-theme="dark"] {
+        --bg: #000000;
+        --text: #ffffff;
+        --secondary-text: #a1a1a6;
+        --card-bg: #1c1c1e;
+        --input-border: #3a3a3c;
+        --btn-secondary: #2c2c2e;
+      }
+
+      body { 
+        font-family: var(--font-stack); 
+        background-color: var(--bg);
+        color: var(--text);
+        margin: 0;
+        padding: 20px 20px 60px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .container { width: 100%; max-width: 440px; }
+
+      #stopwatch { 
+        font-size: 88px; 
+        font-weight: 700; 
+        text-align: center; 
+        margin: 10px 0 0 0;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -2px;
+        color: var(--text);
+      }
+
+      #timeLeft { 
+        font-size: 17px; 
+        text-align: center; 
+        color: var(--secondary-text); 
+        margin-bottom: 20px; 
+        font-weight: 700;
+      }
+
+      .code-display { 
+        text-align: center; 
+        font-size: 12px; 
+        color: var(--secondary-text); 
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        background: none;
+        padding: 0;
+        font-weight: 700;
+      }
+
+      .card { 
+        background: var(--card-bg);
+        border-radius: 20px; 
+        padding: 24px; 
+        margin-bottom: 24px; 
+        transition: background-color 0.3s ease;
+        width: 100%;
+        max-width: 440px;
+        box-sizing: border-box;
+      }
+
+      label { 
+        font-size: 13px; 
+        font-weight: 700; 
+        color: var(--text); 
+        margin-bottom: 8px; 
+        display: block; 
+      }
+
+      input, select, textarea, button { 
+        font-family: var(--font-stack);
+      }
+
+      input, select, textarea { 
+        width: 100%; 
+        padding: 12px; 
+        border-radius: 12px; 
+        border: 1px solid var(--input-border); 
+        background: var(--bg);
+        color: var(--text);
+        font-size: 16px; 
+        margin-bottom: 20px; 
+        box-sizing: border-box;
+        appearance: none;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+      }
+
+      button { 
+        padding: 16px; 
+        cursor: pointer; 
+        border-radius: 50px; 
+        border: none; 
+        font-weight: 700; 
+        font-size: 16px;
+        transition: all 0.2s ease; 
+        width: 100%; 
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      button:active { transform: scale(0.96); opacity: 0.8; }
+
+      #startBtn { background: var(--success); color: white; }
+      #startBtn:disabled { background: var(--input-border); color: var(--secondary-text); cursor: not-allowed; }
+      #stopBtn { background: var(--danger); color: white; }
+      #timerOnlyBtn { background: var(--accent); color: white; }
+      #pauseBtn { background: #ff9500; color: white; }
+      #resetTimerBtn { background: var(--btn-secondary); color: var(--text); }
+      #discardBtn { background: transparent; color: var(--danger); border: 1px solid var(--danger); margin-top: 5px;}
+      #newSessionBtn { background: var(--accent); color: white; }
+
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+      .media-section { 
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+        background: none;
+        border: none;
+        padding: 0;
+      }
+
+      .media-grid { display: contents; }
+
+      .media-btn { 
+        background: var(--bg); 
+        border: 1px solid var(--input-border); 
+        padding: 10px; 
+        font-size: 13px; 
+        color: var(--text);
+        border-radius: 10px;
+        flex: 1;
+        margin-bottom: 0;
+        width: auto;
+        font-weight: 700;
+      }
+
+      .adj-btn { 
+        background: var(--btn-secondary); 
+        color: var(--accent); 
+        padding: 10px; 
+        font-size: 14px; 
+        border-radius: 12px; 
+        flex: 1; 
+        border: none;
+        font-weight: 700;
+        width: auto;
+      }
+
+      #status { 
+        margin-top: 30px; 
+        font-size: 14px; 
+        text-align: center; 
+        color: var(--secondary-text); 
+        font-weight: 700;
+      }
+
+      #cameraContainer { display: none; position: fixed; inset: 0; background: black; z-index: 1000; flex-direction: column; }
+      #video { width: 100%; height: 80%; object-fit: cover; }
+      .camera-controls { height: 20%; display: flex; justify-content: space-around; align-items: center; background: #000; }
+
+      .edit-section { border-top: 1px solid var(--input-border); margin-top: 30px; padding-top: 20px; }
+      .edit-grid { display: flex; gap: 8px; }
+      #loadCode { margin-bottom: 0; }
+      .edit-grid button { width: 80px; margin-bottom: 0; background: var(--text); color: var(--bg); padding: 0; border-radius: 12px; }
+
+      #stopBtn, #pauseBtn, #discardBtn, #newSessionBtn, #resetTimerBtn, #deleteCurrentBtn, #deleteFbAudioBtn { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div id="stopwatch">00:00</div>
+      <div id="timeLeft">7m 15s left</div>
+      <div id="speechCodeDisplay" class="code-display">Code: Generating...</div>
+      <div class="action-controls">
+        <button id="startBtn" onclick="startRecording()" disabled>Start Recording</button>
+        <button id="timerOnlyBtn" onclick="startTimer()">Start Timer</button>
+        <button id="resetTimerBtn" onclick="resetTimer()">Reset Timer</button>
+        <button id="pauseBtn" onclick="toggleTimerPause()">Pause Timer</button>
+        <button id="stopBtn" onclick="stopAndUpload()">Stop & Upload Audio</button>
+        <button id="discardBtn" onclick="stopAndDiscard()">Stop & Reset</button>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button class="adj-btn" onclick="adjustLimit(60)">+1m</button>
+        <button class="adj-btn" onclick="adjustLimit(-60)">-1m</button>
+        <button class="adj-btn" onclick="adjustLimit(15)">+15s</button>
+        <button class="adj-btn" onclick="adjustLimit(-15)">-15s</button>
+      </div>
+    </div>
+    <div class="card">
+      <div id="finishedControls">
+        <button id="newSessionBtn" onclick="softReset()">New Recording</button>
+        <button id="deleteCurrentBtn" style="background:none; color:var(--danger); border:none; margin-top:5px; font-size: 14px; font-weight:700;" onclick="deleteThisSession()">Delete Info</button>
+      </div>
+      <div class="grid">
+        <div><label>Date</label><input type="date" id="recDate" oninput="autoSave()"></div>
+        <div><label>Folder</label><select id="folderSelect" onchange="checkFolder(); autoSave();"><option value="">Loading...</option></select></div>
+      </div>
+      <label>Motion</label><textarea id="motion" placeholder="Enter motion..." oninput="autoSave()"></textarea>
+      <div class="grid">
+        <div><label>Style</label><select id="style" onchange="updateTargetTime(); autoSave();"><option value="BP">BP</option><option value="WSDC">WSDC</option></select></div>
+        <div><label>Position</label><select id="position" onchange="autoSave()"><option value="PM_P1">PM / P1</option><option value="LO_O1">LO / O1</option><option value="DPM_P2">DPM / P2</option><option value="DLO_O2">DLO / O2</option><option value="MG">MG</option><option value="MO">MO</option><option value="GW_P3">GW / P3</option><option value="OW_O3">OW / O3</option><option value="PR">PR</option><option value="OR">OR</option></select></div>
+      </div>
+      <label>Score</label><input type="number" id="score" placeholder="75" oninput="autoSave()">
+      
+      <label>Feedback</label>
+      <div class="media-section">
+        <div class="media-grid">
+          <button class="media-btn" onclick="openCamera('feedback')">Photo</button>
+          <button class="media-btn" onclick="document.getElementById('fbUp').click()">Upload</button>
+          <button class="media-btn" id="fbTrans" onclick="toggleFeedbackTranscription()">Record</button>
+          <button class="media-btn" id="deleteFbAudioBtn" style="color:var(--danger); border-color:var(--danger);" onclick="deleteFeedbackAudio()">Delete Recording</button>
+        </div>
+        <input type="file" id="fbUp" hidden accept="image/*" onchange="handleFileSelect(this, 'feedback')">
+      </div>
+      <textarea id="feedback" placeholder="Feedback notes..." oninput="autoSave()"></textarea>
+      
+      <label>Notes</label>
+      <div class="media-section">
+        <div class="media-grid">
+          <button class="media-btn" onclick="openCamera('notes')">Photo</button>
+          <button class="media-btn" onclick="document.getElementById('noteUp').click()">Upload</button>
+        </div>
+        <input type="file" id="noteUp" hidden accept="image/*" onchange="handleFileSelect(this, 'notes')">
+      </div>
+      <textarea id="notes" placeholder="Session notes..." oninput="autoSave()"></textarea>
+
+      <div class="edit-section">
+        <label>Load by Code (Edit Mode)</label>
+        <div class="edit-grid">
+          <input type="text" id="loadCode" placeholder="Paste Code Here">
+          <button onclick="loadByCode()">Load</button>
+        </div>
+      </div>
+    </div>
+    <div id="status">Ready.</div>
+    <div id="cameraContainer"><video id="video" autoplay playsinline></video><div class="camera-controls"><button onclick="closeCamera()" style="color:white; width:auto; background:none; font-weight:700;">Cancel</button><button style="width:70px;height:70px;border-radius:50%;border:5px solid white;background:var(--danger);" onclick="takeSnapshot()"></button></div><canvas id="canvas" style="display:none;"></canvas></div>
+
+    <script>
+      let recorder = new MicRecorder({ bitRate: 128 }), elapsedSeconds = 0, targetSeconds = 435, timerInterval, timerIsPaused = false;
+      let feedbackRecorder = new MicRecorder({ bitRate: 128 });
+      let recognition = null;
+      let isFeedbackTranscribing = false;
+      let fbTranscriptSession = "";
+      let autoSaveTimeout = null;
+
+      let currentRow = null, currentFileUrl = null, sessionSpeechCode = "", activeMediaTarget = "";
+
+      const pad = v => String(v).padStart(2, '0');
+
+      function autoSave() {
+        document.getElementById('status').innerText = "Typing...";
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(() => {
+          saveMetadata();
+        }, 1500);
+      }
+
+      function initSession() {
+        document.getElementById('recDate').valueAsDate = new Date();
+        const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        sessionSpeechCode = Array.from({length:10}, () => charset.charAt(Math.floor(Math.random() * charset.length))).join('');
+        document.getElementById('speechCodeDisplay').innerText = "Code: " + sessionSpeechCode;
+        document.getElementById('newSessionBtn').style.display = 'none';
+        document.getElementById('deleteCurrentBtn').style.display = 'none';
+        document.getElementById('deleteFbAudioBtn').style.display = 'none';
+        document.getElementById('fbTrans').style.display = 'block';
+        document.getElementById('startBtn').style.display = 'block';
+        document.getElementById('timerOnlyBtn').style.display = 'block';
+        document.getElementById('resetTimerBtn').style.display = 'none';
+        resetTimer();
+      }
+
+      window.onload = () => {
+        initSession();
+        if (typeof google !== 'undefined' && google.script) {
+          google.script.run.withSuccessHandler(folders => {
+            const select = document.getElementById('folderSelect'); select.innerHTML = '<option value="">-- Choose --</option>';
+            google.script.run.withSuccessHandler(defaultId => {
+              folders.forEach(f => { let opt = new Option(f.name, f.id); if (f.id === defaultId) opt.selected = true; select.add(opt); });
+              checkFolder();
+            }).getTargetFolderId();
+          }).getUserFolders();
+        }
+      };
+
+      function checkFbDeleteButtonVisibility() {
+        const area = document.getElementById('feedback');
+        // Logic check: only swap to delete if it's an mp3 recording (Feedback specific)
+        const hasRecordingUrl = area.value.includes("drive.google.com") && area.value.toLowerCase().includes(".feedback.");
+        if (hasRecordingUrl) {
+          document.getElementById('deleteFbAudioBtn').style.display = "block";
+          document.getElementById('fbTrans').style.display = "none";
+        } else {
+          document.getElementById('deleteFbAudioBtn').style.display = "none";
+          document.getElementById('fbTrans').style.display = "block";
+        }
+      }
+
+      async function loadByCode() {
+        const code = document.getElementById('loadCode').value.trim();
+        if(!code) return;
+        document.getElementById('status').innerText = "Searching...";
+        google.script.run.withSuccessHandler(res => {
+          if(res.success) {
+            currentRow = res.row;
+            sessionSpeechCode = res.data.speechCode;
+            currentFileUrl = res.data.fileUrl;
+            document.getElementById('speechCodeDisplay').innerText = "Code: " + sessionSpeechCode + " (EDITING)";
+            document.getElementById('recDate').value = res.data.date;
+            document.getElementById('motion').value = res.data.motion;
+            document.getElementById('style').value = res.data.style;
+            document.getElementById('position').value = res.data.position;
+            document.getElementById('score').value = res.data.score;
+            document.getElementById('feedback').value = res.data.feedback;
+            document.getElementById('notes').value = res.data.notes;
+            document.getElementById('newSessionBtn').style.display = "block";
+            document.getElementById('deleteCurrentBtn').style.display = "block";
+            document.getElementById('startBtn').style.display = "none";
+            document.getElementById('timerOnlyBtn').style.display = "none";
+            document.getElementById('status').innerText = "✅ Session Loaded";
+            checkFbDeleteButtonVisibility();
+            updateTargetTime();
+          } else { document.getElementById('status').innerText = "❌ " + res.error; }
+        }).getByCode(code);
+      }
+
+      async function openCamera(target) {
+        activeMediaTarget = target;
+        try {
+          document.getElementById('video').srcObject = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+          document.getElementById('cameraContainer').style.display = 'flex';
+        } catch (e) { alert("Camera denied."); }
+      }
+
+      function closeCamera() {
+        const v = document.getElementById('video'); if (v.srcObject) v.srcObject.getTracks().forEach(t => t.stop());
+        document.getElementById('cameraContainer').style.display = 'none';
+      }
+
+      function takeSnapshot() {
+        const v = document.getElementById('video'), c = document.getElementById('canvas');
+        c.width = v.videoWidth; c.height = v.videoHeight;
+        c.getContext('2d').drawImage(v, 0, 0);
+        uploadImage(c.toDataURL('image/jpeg').split(',')[1], getBaseSessionName(), activeMediaTarget);
+        closeCamera();
+      }
+
+      function handleFileSelect(input, target) {
+        activeMediaTarget = target; const r = new FileReader();
+        r.onload = (e) => uploadImage(e.target.result.split(',')[1], getBaseSessionName(), target);
+        r.readAsDataURL(input.files[0]);
+      }
+
+      function getBaseSessionName() {
+        const n = new Date();
+        return `[${sessionSpeechCode}].${document.getElementById('style').value}.${document.getElementById('position').value}.${pad(n.getDate())}.${pad(n.getMonth()+1)}`;
+      }
+
+      function uploadImage(base64, baseFolderName, type) {
+        document.getElementById('status').innerText = "Uploading Media...";
+        const mediaNaming = getFormData();
+        google.script.run.withSuccessHandler(res => {
+          if(res && res.success) { 
+            const targetArea = document.getElementById(type);
+            if (res.folderUrl && !targetArea.value.includes(res.folderUrl)) targetArea.value = res.folderUrl + "\n" + targetArea.value;
+            document.getElementById('status').innerText = "✅ Saved to Folder";
+            saveMetadata(); 
+          } else { document.getElementById('status').innerText = "❌ Upload Failed"; }
+        }).uploadImageToFolder(base64, mediaNaming, document.getElementById('folderSelect').value, type);
+      }
+
+      function startTimer() {
+        if (!timerInterval) {
+          document.getElementById('pauseBtn').style.display = "block";
+          document.getElementById('timerOnlyBtn').style.display = "none";
+          document.getElementById('resetTimerBtn').style.display = "block";
+          timerInterval = setInterval(() => { if (!timerIsPaused) { elapsedSeconds++; updateUI(); } }, 1000);
+        }
+      }
+
+      function resetTimer() {
+        clearInterval(timerInterval); timerInterval = null; elapsedSeconds = 0; timerIsPaused = false;
+        document.getElementById('pauseBtn').innerText = "Pause Timer";
+        document.getElementById('pauseBtn').style.display = "none";
+        document.getElementById('timerOnlyBtn').style.display = "block";
+        document.getElementById('resetTimerBtn').style.display = "none";
+        updateUI();
+      }
+
+      function startRecording() {
+        recorder.start().then(() => {
+          document.getElementById('status').innerText = "🔴 RECORDING...";
+          document.getElementById('startBtn').style.display = "none";
+          document.getElementById('timerOnlyBtn').style.display = "none";
+          document.getElementById('resetTimerBtn').style.display = "none";
+          document.getElementById('stopBtn').style.display = "block";
+          document.getElementById('discardBtn').style.display = "block";
+          startTimer();
+        });
+      }
+
+      function stopAndDiscard() {
+        if(!confirm("Stop and DISCARD?")) return;
+        recorder.stop(); resetTimer();
+        document.getElementById('stopBtn').style.display = "none";
+        document.getElementById('discardBtn').style.display = "none";
+        document.getElementById('startBtn').style.display = "block";
+        document.getElementById('timerOnlyBtn').style.display = "block";
+      }
+
+      function stopAndUpload() {
+        document.getElementById('status').innerText = "Uploading Audio...";
+        timerIsPaused = true;
+        document.getElementById('pauseBtn').innerText = "▶ Resume Timer";
+        recorder.stop().getMp3().then(([buffer, blob]) => {
+          const r = new FileReader();
+          r.onloadend = () => {
+            google.script.run.withSuccessHandler(res => {
+              currentRow = parseInt(res.row); currentFileUrl = res.url;
+              document.getElementById('status').innerText = "✅ Saved";
+              document.getElementById('stopBtn').style.display = "none";
+              document.getElementById('discardBtn').style.display = "none";
+              document.getElementById('newSessionBtn').style.display = "block";
+              document.getElementById('deleteCurrentBtn').style.display = "block";
+            }).saveAudioFile(r.result.split(',')[1], null, document.getElementById('folderSelect').value, getFormData(), currentRow);
+          };
+          r.readAsDataURL(blob);
+        });
+      }
+
+      function toggleFeedbackTranscription() { if (!isFeedbackTranscribing) startFeedbackSession(); else stopFeedbackSession(); }
+
+      function startFeedbackSession() {
+        if (!('webkitSpeechRecognition' in window)) { alert("Dictation not supported."); return; }
+        isFeedbackTranscribing = true; fbTranscriptSession = "";
+        const btn = document.getElementById('fbTrans');
+        btn.innerText = "Stop Feedback"; btn.style.background = "var(--danger)"; btn.style.color = "white";
+        document.getElementById('status').innerText = "🎙 Recording Feedback...";
+        
+        recognition = new webkitSpeechRecognition(); 
+        recognition.continuous = true; 
+        recognition.interimResults = false; 
+        recognition.lang = 'en-US';
+        
+        recognition.onresult = (event) => {
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              fbTranscriptSession += event.results[i][0].transcript + " ";
+            }
+          }
+        };
+        
+        recognition.onend = () => { 
+          if (isFeedbackTranscribing) recognition.start(); 
+        };
+        
+        recognition.start();
+        feedbackRecorder.start().catch(err => console.error("Feedback audio failed", err));
+      }
+
+      function stopFeedbackSession() {
+        isFeedbackTranscribing = false;
+        const btn = document.getElementById('fbTrans');
+        btn.innerText = "Record"; btn.style.background = "white"; btn.style.color = "inherit";
+        document.getElementById('status').innerText = "Saving Feedback...";
+        
+        if (recognition) { 
+          recognition.onend = null; 
+          recognition.stop(); 
+        }
+
+        feedbackRecorder.stop().getMp3().then(([buffer, blob]) => {
+          const r = new FileReader();
+          r.onloadend = () => {
+            const area = document.getElementById('feedback');
+            const placeholder = "[Upload Pending]";
+            const cleanTranscript = fbTranscriptSession.trim();
+            const entryText = `${placeholder}\n\n${cleanTranscript}\n`;
+            area.value += (area.value ? '\n' : '') + entryText;
+            
+            let data = getFormData();
+            data.isFeedback = true;
+
+            google.script.run.withSuccessHandler(res => {
+              if (res.success) {
+                currentRow = parseInt(res.row);
+                area.value = area.value.replace(placeholder, res.url);
+                document.getElementById('status').innerText = "✅ Feedback Saved";
+                checkFbDeleteButtonVisibility();
+                saveMetadata();
+              }
+            }).saveAudioFile(r.result.split(',')[1], null, null, data, currentRow);
+          };
+          r.readAsDataURL(blob);
+        });
+      }
+
+      function deleteFeedbackAudio() {
+        const area = document.getElementById('feedback');
+        const lines = area.value.split('\n');
+        let fileUrl = "";
+        for (let line of lines) {
+          if (line.includes("drive.google.com")) {
+            fileUrl = line.trim();
+            break;
+          }
+        }
+        if (!fileUrl) { alert("No feedback audio link found."); return; }
+        if (!confirm("Delete the feedback recording and transcript?")) return;
+        
+        document.getElementById('status').innerText = "Deleting File...";
+        google.script.run.withSuccessHandler(res => {
+          if (res.success) {
+            area.value = "";
+            document.getElementById('status').innerText = "🗑 Feedback Deleted";
+            checkFbDeleteButtonVisibility();
+            saveMetadata();
+          }
+        }).deleteFeedbackFile(fileUrl);
+      }
+
+      function getFormData() {
+        return { 
+          speechCode: sessionSpeechCode, 
+          date: document.getElementById('recDate').value, 
+          motion: document.getElementById('motion').value, 
+          style: document.getElementById('style').value, 
+          position: document.getElementById('position').value, 
+          score: document.getElementById('score').value, 
+          feedback: document.getElementById('feedback').value, 
+          notes: document.getElementById('notes').value,
+          fileUrl: currentFileUrl,
+          isFeedback: false
+        };
+      }
+
+      function saveMetadata() {
+        document.getElementById('status').innerText = "Saving...";
+        google.script.run.withSuccessHandler((res) => {
+          if (res && res.row) currentRow = parseInt(res.row);
+          document.getElementById('status').innerText = "✅ Auto-Saved";
+          document.getElementById('newSessionBtn').style.display = "block";
+          document.getElementById('deleteCurrentBtn').style.display = "block";
+        }).saveAudioFile(null, null, null, getFormData(), currentRow);
+      }
+
+      function deleteThisSession() {
+        if(!confirm("Purge everything for this code?")) return;
+        google.script.run.withSuccessHandler(() => softReset()).deleteByCode(sessionSpeechCode);
+      }
+
+      function updateUI() {
+        const m = Math.floor(elapsedSeconds / 60), s = elapsedSeconds % 60, rem = targetSeconds - elapsedSeconds, abs = Math.abs(rem);
+        document.getElementById('stopwatch').innerText = `${pad(m)}:${pad(s)}`;
+        const tl = document.getElementById('timeLeft'); tl.innerText = `${rem < 0 ? '-' : ''}${Math.floor(abs/60)}m ${abs%60}s left`;
+        tl.style.color = rem >= 0 ? "var(--secondary-text)" : "var(--danger)";
+      }
+
+      function toggleTimerPause() { timerIsPaused = !timerIsPaused; document.getElementById('pauseBtn').innerText = timerIsPaused ? "Resume" : "Pause"; }
+      function checkFolder() { document.getElementById('startBtn').disabled = !document.getElementById('folderSelect').value; }
+      function adjustLimit(n) { targetSeconds += n; updateUI(); }
+      function updateTargetTime() { targetSeconds = (document.getElementById('style').value === "WSDC") ? 495 : 435; updateUI(); }
+      function softReset() {
+        document.getElementById('score').value = ''; document.getElementById('motion').value = '';
+        document.getElementById('feedback').value = ''; document.getElementById('notes').value = '';
+        document.getElementById('loadCode').value = ''; currentRow = null; currentFileUrl = null; initSession();
+        document.getElementById('status').innerText = "Ready.";
+      }
+    </script>
+  </body>
+</html>
