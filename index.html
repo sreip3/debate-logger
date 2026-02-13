@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="light">
   <head>
-    <!-- Importing Comic Neue from Google Fonts for cross-platform support (especially iOS Safari) -->
+    <!-- Importing Comic Neue and other fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Inter:wght@400;700&family=Noto+Serif:ital@0;1&family=Roboto+Mono&display=swap" rel="stylesheet">
     
     <script src="https://unpkg.com/mic-recorder-to-mp3@2.2.2/dist/index.min.js"></script>
     <style>
@@ -18,7 +18,6 @@
         --card-bg: #f5f5f7;
         --input-border: #d2d2d7;
         --btn-secondary: #e8e8ed;
-        /* Comic Sans fallback stack for iOS and other systems */
         --font-stack: "Comic Neue", "Chalkboard SE", "Comic Sans MS", "Comic Sans", cursive;
       }
 
@@ -36,13 +35,73 @@
         background-color: var(--bg);
         color: var(--text);
         margin: 0;
-        padding: 20px 20px 60px 20px;
+        padding: 40px 20px 60px 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
         transition: background-color 0.3s ease, color 0.3s ease;
         -webkit-font-smoothing: antialiased;
       }
+
+      /* MENU STYLES */
+      .top-menu {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        z-index: 1500;
+      }
+
+      .menu-trigger {
+        background: none;
+        border: none;
+        color: var(--text);
+        font-size: 24px;
+        cursor: pointer;
+        padding: 10px;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.2s;
+      }
+
+      .menu-trigger:hover { background: var(--btn-secondary); }
+
+      .menu-dropdown {
+        display: none;
+        position: absolute;
+        top: 50px;
+        right: 0;
+        background: var(--card-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 14px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        width: 200px;
+        overflow: hidden;
+        animation: fadeIn 0.2s ease;
+      }
+
+      .menu-dropdown button {
+        width: 100%;
+        padding: 12px 16px;
+        text-align: left;
+        background: none;
+        border: none;
+        border-bottom: 1px solid var(--input-border);
+        color: var(--text);
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 0;
+        margin-bottom: 0;
+        cursor: pointer;
+      }
+
+      .menu-dropdown button:last-child { border-bottom: none; }
+      .menu-dropdown button:hover { background: var(--btn-secondary); }
+
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
       .container { width: 100%; max-width: 440px; }
 
@@ -96,7 +155,7 @@
       }
 
       input, select, textarea, button { 
-        font-family: var(--font-stack);
+        font-family: inherit;
       }
 
       input, select, textarea { 
@@ -183,7 +242,7 @@
         font-weight: 700;
       }
 
-      #cameraContainer { display: none; position: fixed; inset: 0; background: black; z-index: 1000; flex-direction: column; }
+      #cameraContainer { display: none; position: fixed; inset: 0; background: black; z-index: 2000; flex-direction: column; }
       #video { width: 100%; height: 80%; object-fit: cover; }
       .camera-controls { height: 20%; display: flex; justify-content: space-around; align-items: center; background: #000; }
 
@@ -193,9 +252,52 @@
       .edit-grid button { width: 80px; margin-bottom: 0; background: var(--text); color: var(--bg); padding: 0; border-radius: 12px; }
 
       #stopBtn, #pauseBtn, #discardBtn, #newSessionBtn, #resetTimerBtn, #deleteCurrentBtn, #deleteFbAudioBtn { display: none; }
+
+      /* Setup Screen Overlay */
+      #setupOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        z-index: 3000;
+        padding: 40px 20px;
+        flex-direction: column;
+        align-items: center;
+        overflow-y: auto;
+      }
+      #setupOverlay h2 { margin-bottom: 24px; text-align: center; }
+      #setupOverlay .setup-card { background: var(--card-bg); padding: 24px; border-radius: 20px; width: 100%; max-width: 440px; box-sizing: border-box; }
     </style>
   </head>
   <body>
+    <!-- Simple Button Menu -->
+    <div class="top-menu">
+      <button class="menu-trigger" onclick="toggleMenu()">⋮</button>
+      <div id="menuDropdown" class="menu-dropdown">
+        <button onclick="redoSetup()">Re-do initial setup</button>
+        <button onclick="toggleTheme()">Dark Mode/Light Mode</button>
+        <button onclick="changeFont()">Change Font</button>
+      </div>
+    </div>
+
+    <!-- Setup Overlay -->
+    <div id="setupOverlay">
+      <div class="setup-card">
+        <h2>Initial Setup</h2>
+        <label>Select the Speech Recordings Folder:</label>
+        <select id="setupTarget"><option>Loading folders...</option></select>
+        
+        <label>Select the Feedback Recordings Folder:</label>
+        <select id="setupFeedback"><option>Loading folders...</option></select>
+        
+        <label>Select the Notes Recordings Folder:</label>
+        <select id="setupNotes"><option>Loading folders...</option></select>
+        
+        <button id="finishSetupBtn" style="background: var(--accent); color:white; margin-top: 10px;" onclick="submitSetup()">Finish Setup</button>
+        <div id="setupStatus" style="text-align:center; font-size:12px; margin-top:10px; color:var(--secondary-text);">Please link your Drive folders to start.</div>
+      </div>
+    </div>
+
     <div class="card">
       <div id="stopwatch">00:00</div>
       <div id="timeLeft">7m 15s left</div>
@@ -271,10 +373,59 @@
       let isFeedbackTranscribing = false;
       let fbTranscriptSession = "";
       let autoSaveTimeout = null;
+      let fonts = [
+        '"Comic Neue", "Chalkboard SE", "Comic Sans MS", cursive',
+        '"Inter", -apple-system, sans-serif',
+        '"Noto Serif", Georgia, serif',
+        '"Roboto Mono", monospace'
+      ];
+      let fontIndex = 0;
 
       let currentRow = null, currentFileUrl = null, sessionSpeechCode = "", activeMediaTarget = "";
 
       const pad = v => String(v).padStart(2, '0');
+
+      // --- MENU ACTIONS ---
+      function toggleMenu() {
+        const drop = document.getElementById('menuDropdown');
+        drop.style.display = drop.style.display === 'block' ? 'none' : 'block';
+      }
+
+      window.onclick = function(event) {
+        if (!event.target.matches('.menu-trigger')) {
+          document.getElementById('menuDropdown').style.display = 'none';
+        }
+      }
+
+      function redoSetup() {
+        if(!confirm("Reset folder settings and re-do setup?")) return;
+        google.script.run.withSuccessHandler(() => {
+          document.getElementById('setupOverlay').style.display = 'flex';
+          loadSetupFolders();
+        }).clearSetupProperties();
+      }
+
+      function toggleTheme() {
+        const html = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        persistAppearance();
+      }
+
+      function changeFont() {
+        fontIndex = (fontIndex + 1) % fonts.length;
+        document.body.style.fontFamily = fonts[fontIndex];
+        persistAppearance();
+      }
+
+      function persistAppearance() {
+        const settings = {
+          theme: document.documentElement.getAttribute('data-theme'),
+          fontIndex: fontIndex
+        };
+        google.script.run.saveAppearance(settings);
+      }
 
       function autoSave() {
         document.getElementById('status').innerText = "Typing...";
@@ -299,22 +450,78 @@
         resetTimer();
       }
 
-      window.onload = () => {
-        initSession();
-        if (typeof google !== 'undefined' && google.script) {
-          google.script.run.withSuccessHandler(folders => {
-            const select = document.getElementById('folderSelect'); select.innerHTML = '<option value="">-- Choose --</option>';
+      function loadMainAppFolders() {
+        google.script.run.withSuccessHandler(folders => {
+            const select = document.getElementById('folderSelect'); 
+            select.innerHTML = '<option value="">-- Choose --</option>';
             google.script.run.withSuccessHandler(defaultId => {
-              folders.forEach(f => { let opt = new Option(f.name, f.id); if (f.id === defaultId) opt.selected = true; select.add(opt); });
+              folders.forEach(f => { 
+                let opt = new Option(f.name, f.id); 
+                if (f.id === defaultId) opt.selected = true; 
+                select.add(opt); 
+              });
               checkFolder();
             }).getTargetFolderId();
           }).getUserFolders();
+      }
+
+      window.onload = () => {
+        initSession();
+        if (typeof google !== 'undefined' && google.script) {
+          // Load appearance
+          google.script.run.withSuccessHandler(settings => {
+            if (settings) {
+              document.documentElement.setAttribute('data-theme', settings.theme);
+              fontIndex = parseInt(settings.fontIndex);
+              document.body.style.fontFamily = fonts[fontIndex];
+            }
+          }).getAppearance();
+
+          // Check for first-time setup
+          google.script.run.withSuccessHandler(status => {
+            if (!status.isConfigured) {
+              document.getElementById('setupOverlay').style.display = 'flex';
+              loadSetupFolders();
+            } else {
+              loadMainAppFolders();
+            }
+          }).getSetupStatus();
         }
       };
 
+      function loadSetupFolders() {
+        google.script.run.withSuccessHandler(folders => {
+          const ids = ['setupTarget', 'setupFeedback', 'setupNotes'];
+          ids.forEach(id => {
+            const sel = document.getElementById(id);
+            sel.innerHTML = '<option value="">-- Select Folder --</option>';
+            folders.forEach(f => sel.add(new Option(f.name, f.id)));
+          });
+        }).getUserFolders();
+      }
+
+      function submitSetup() {
+        const config = {
+          target: document.getElementById('setupTarget').value,
+          feedback: document.getElementById('setupFeedback').value,
+          notes: document.getElementById('setupNotes').value
+        };
+        if (!config.target || !config.feedback || !config.notes) {
+          alert("Please select all folders."); return;
+        }
+        document.getElementById('setupStatus').innerText = "Saving configuration...";
+        document.getElementById('finishSetupBtn').disabled = true;
+        
+        google.script.run.withSuccessHandler(() => {
+          document.getElementById('setupOverlay').style.display = 'none';
+          document.getElementById('finishSetupBtn').disabled = false;
+          document.getElementById('status').innerText = "Setup Complete. Initializing...";
+          loadMainAppFolders(); 
+        }).saveSetup(config);
+      }
+
       function checkFbDeleteButtonVisibility() {
         const area = document.getElementById('feedback');
-        // Logic check: only swap to delete if it's an mp3 recording (Feedback specific)
         const hasRecordingUrl = area.value.includes("drive.google.com") && area.value.toLowerCase().includes(".feedback.");
         if (hasRecordingUrl) {
           document.getElementById('deleteFbAudioBtn').style.display = "block";
@@ -479,10 +686,7 @@
           }
         };
         
-        recognition.onend = () => { 
-          if (isFeedbackTranscribing) recognition.start(); 
-        };
-        
+        recognition.onend = () => { if (isFeedbackTranscribing) recognition.start(); };
         recognition.start();
         feedbackRecorder.start().catch(err => console.error("Feedback audio failed", err));
       }
@@ -493,10 +697,7 @@
         btn.innerText = "Record"; btn.style.background = "white"; btn.style.color = "inherit";
         document.getElementById('status').innerText = "Saving Feedback...";
         
-        if (recognition) { 
-          recognition.onend = null; 
-          recognition.stop(); 
-        }
+        if (recognition) { recognition.onend = null; recognition.stop(); }
 
         feedbackRecorder.stop().getMp3().then(([buffer, blob]) => {
           const r = new FileReader();
@@ -529,10 +730,7 @@
         const lines = area.value.split('\n');
         let fileUrl = "";
         for (let line of lines) {
-          if (line.includes("drive.google.com")) {
-            fileUrl = line.trim();
-            break;
-          }
+          if (line.includes("drive.google.com")) { fileUrl = line.trim(); break; }
         }
         if (!fileUrl) { alert("No feedback audio link found."); return; }
         if (!confirm("Delete the feedback recording and transcript?")) return;
