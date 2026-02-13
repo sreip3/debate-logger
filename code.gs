@@ -88,9 +88,6 @@ function getUserFolders() {
   return list.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/**
- * Helper to convert various date formats to specific strings
- */
 function formatCustomDate(dateVal, format) {
   if (!dateVal) return "";
   var date;
@@ -106,9 +103,6 @@ function formatCustomDate(dateVal, format) {
   return Utilities.formatDate(date, Session.getScriptTimeZone(), format);
 }
 
-/**
- * Loads data for a specific code and ensures the date is formatted for display
- */
 function getByCode(code) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Speech Tracker");
@@ -140,9 +134,6 @@ function getByCode(code) {
   } catch (e) { return { success: false, error: e.toString() }; }
 }
 
-/**
- * Saves audio and metadata, and renames existing files (Speech, Feedback, Notes) if they exist
- */
 function saveAudioFile(base64Data, fileNameIgnored, folderId, info, existingRow) {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
