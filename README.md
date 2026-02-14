@@ -1,6 +1,14 @@
 # About the Interface
 
+So, for a long time, I’ve always been interested in how we can use AI to improve debating skills. Not in a way of cheating (i.e., inserting a motion into chat gpt or gemini and asking for a case), but to create tools to help us and grow our skills. 
 
+Essentially, I’ve spent some time prompting Gemini and created a speech logger that records your speeches, motions, debate scores, feedback, and notes. It’s hard to visualize through just plain text, so here’s a video of what it is (of course, you can do the same things this app does manually, but I made this since I think it’s much more efficient than uploading a bajillion files into a folder): https://www.youtube.com/watch?v=ZeHgPrXUmyU
+
+The base of the app is a Google spreadsheet, and using Apps Script, I’ve built a nice interface. I also used AppSheet, so you can use it on your phone. I’ve included features through just random ideas and testing. There are still some minor bugs, but the app seems to be working fine. 
+
+If you want to install the app, here’s the GitHub link with the guide and the code: https://github.com/sreip3/debate-logger/tree/main. I’ll be constantly updating this github with small changes as I find more bugs and add more features. Please, please, do comment your opinions! I’m trying to use AI to develop other debate-related tools that I’ll definitely share if people find them helpful. Also, I encourage you to hop in Gemini or chat gpt for an hour or two and create something that might help you!
+
+Just note, I am not a coding expert, which is why I literally just prompted AI a bunch of times to make it for me - so please look over it by yourself before you download it. I can guarantee I haven’t tampered with it maliciously, but of course I can’t guarantee that AI has not (but it probably didn’t).
 
 # Simple Installation Guide
 
