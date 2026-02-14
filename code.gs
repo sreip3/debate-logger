@@ -23,11 +23,29 @@ function getSetupStatus() {
   };
 }
 
+/**
+ * Initializes the Spreadsheet headers if the sheet doesn't exist
+ */
+function initializeSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Speech Tracker");
+  if (!sheet) {
+    sheet = ss.insertSheet("Speech Tracker");
+    var headers = ["Speech Code", "Date", "Motion", "Style", "Position", "Score", "Recording", "Feedback", "Notes"];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight("bold").setBackground("#f3f3f3");
+    sheet.setFrozenRows(1);
+  }
+}
+
 function saveSetup(config) {
   var props = PropertiesService.getScriptProperties();
   props.setProperty('TARGET_FOLDER', config.target);
   props.setProperty('FEEDBACK_FOLDER', config.feedback);
   props.setProperty('NOTES_FOLDER', config.notes);
+  
+  // Ensure the sheet and headers are created on first setup
+  initializeSheet();
+  
   return { success: true };
 }
 
