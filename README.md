@@ -93,7 +93,7 @@ Follow these steps to link your Google Sheet with an AppSheet mobile interface:
 > [!NOTE]
 > **Important:** Every time you modify the script code, you must create a **New Deployment** and update the link in the AppSheet Target section.
 
-### 7. Install
+### 7. Install (on your phone)
 * In the same action, set **Position** to **Primary**.
 * (Optional) Under the **Display** section, choose a custom icon for your button.
 * Click the **Save icon** at the top right of AppSheet.
