@@ -19,7 +19,7 @@
 2.  **Apps Script Integration**
     * Click the **Extensions** menu at the top of your sheet.
     * Select **Apps Script**.
-    * In the `Code.gs` file, delete any existing code and **paste the script in this GitHub**.
+    * In the `Code.gs` file, delete any existing code and **paste the script in this GitHub (above)**. YOU MUST DELETE THE EXISTING CODE!!!
     * Save the project (`Cmd + S` or `Ctrl + S`).
 
 3.  **Interface Setup**
