@@ -14,7 +14,7 @@
         * `Notes`
         * `Feedback`
     * Create a new **Google Sheet** anywhere you like, but I recommend placing it inside the main folder.
-    > **Note:** You can name these whatever you like, as long as they are identifiable to you.
+    > **Note:** You can name these whatever you like, as long as they are identifiable to you. Furthermore, make sure the three sub-folders are distinct from all other folders in your drive. For example, don't name it "speech" if you have another folder that is also called "speech".
 
 2.  **Apps Script Integration**
     * Click the **Extensions** menu at the top of your sheet.
