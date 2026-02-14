@@ -13,45 +13,45 @@
         * `Speech`
         * `Notes`
         * `Feedback`
+    * Create a new **Google Sheet** anywhere you like, but I recommend placing it inside the main folder.
     > **Note:** You can name these whatever you like, as long as they are identifiable to you.
 
-2.  **Spreadsheet**
-    * Create a new **Google Sheet** anywhere you like, but I recommend placing it inside the main folder.
-    * Select all cells (`Cmd + A` or `Ctrl + A`).
-    * Go to **Format** > **Wrapping** > **Wrap**.
-    * Go to **Format** > **Alignment** > **Top**.
-
-3.  **Apps Script Integration**
+2.  **Apps Script Integration**
     * Click the **Extensions** menu at the top of your sheet.
     * Select **Apps Script**.
     * In the `Code.gs` file, delete any existing code and **paste the script in this GitHub**.
     * Save the project (`Cmd + S` or `Ctrl + S`).
 
-4.  **Interface Setup**
+3.  **Interface Setup**
     * Click the **+ (plus)** button next to "Files" and select **HTML**.
     * Name the file `index.html`.
     * Paste the HTML code in this GitHub into this file and **click save again**.
 
-5.  **Permissions**
+4.  **Permissions**
     * **Reload** your Google Sheet. You will see a new **Recorder** button on the top menu.
     * Click **Recorder** > **Open Recorder**.
     * An authorization prompt will appear. Follow these steps:
         * Click **Okay** → **Advanced** → **Go to [Project Name] (Unsafe)**.
         * Click **Select All** and **Continue**.
 
-6.  **Final Steps**
+5.  **Final Steps**
     * Complete the initial setup by selecting the folders you created in Step 1.
+    * Delete **Sheet1**
+    * In the **SpeechTracker** sheet,
+        * Select all cells (`Cmd + A` or `Ctrl + A`).
+        * Go to **Format** > **Wrapping** > **Wrap**.
+        * Go to **Format** > **Alignment** > **Top**.
     * **Success!** You are now ready to use your new logger.
 
 # Phone Installation
 
 Follow these steps to link your Google Sheet with an AppSheet mobile interface:
 
-### 1. AppSheet Creation
+### 1. AppSheet Creation (on your computer)
 * In your Google Sheet, go to **Extensions** > **AppSheet** > **Create an App**.
 * Select **Continue** and then **Allow** to grant necessary permissions.
 
-### 2. Data Configuration
+### 2. Data Configuration (on your computer)
 * Click the **Data icon** (left sidebar).
 * Locate your main table and adjust the following:
     * **Unselect** `Speech Code` as the Key and Label.
@@ -61,27 +61,27 @@ Follow these steps to link your Google Sheet with an AppSheet mobile interface:
     * Change `Recording`, `Feedback`, and `Notes` to **URL**.
     * Change `Motion` to **Long Text**.
 
-### 3. View Configuration
+### 3. View Configuration (on your computer)
 * Hover over the **Phone icon** (left sidebar) and click **Views**.
 * Scroll to **View Options** and configure:
-    * **Sort By**: `_RowNumber` (Set to **Descending**).
+    * **Sort By**: Click **Add** and select `_RowNumber` (Set to **Descending**).
     * **Group By**: Click **Add** and select `Style` (Set to **Descending**).
 
-### 4. Action Setup
+### 4. Action Setup (on your computer)
 * Click the **Lightning Bolt icon** (Actions) on the left.
-* **Hide Default Action**: Locate the "Add" action and change its **Position** to **Hide**.
+* Locate the "Add" action and change its **Position** to **Hide**.
 * **Create Custom Launcher**:
-    * Click **Create a new action** and name it `Open Logger`.
+    * Click the **Add Action** button (+ icon), then click **Create a new action** and name it `Open Logger`.
     * Set **Do This** to: `External: go to a website`.
 
-### 5. Web App Deployment
+### 5. Web App Deployment (on your computer)
 * Return to your **Google Sheet** > **Extensions** > **Apps Script**.
 * Click **Deploy** > **New Deployment**.
 * Click the **Settings Cog** next to "Select type" and choose **Web App**.
 * Set **Who has access** to **"Only myself"** (crucial for security).
 * Click **Deploy** and **Copy** the provided Web App URL.
 
-### 6. Linking the Interface
+### 6. Linking the Interface (on your computer)
 * Go back to **AppSheet**.
 * In the **Target** field of your `Open Logger` action, paste the link inside **quotation marks - highly important**.
     * *Example:* `"https://script.google.com/macros/s/.../exec"`
