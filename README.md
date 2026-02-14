@@ -57,7 +57,7 @@ Follow these steps to link your Google Sheet with an AppSheet mobile interface:
 ### 2. Data Configuration (on your computer)
 * Click the **Data icon** (left sidebar).
 * Locate your main table and adjust the following:
-    * **Unselect** `Speech Code` as the Key and Label.
+    * **Unselect** `Speech Code` as the Key and Label - you may have to scroll to the right to find this.
     * **Select** `_RowNumber` as the **Key**.
     * **Select** `Motion` as the **Label**.
 * **Update Column Types**:
@@ -67,7 +67,7 @@ Follow these steps to link your Google Sheet with an AppSheet mobile interface:
 ### 3. View Configuration (on your computer)
 * Hover over the **Phone icon** (left sidebar) and click **Views**.
 * Scroll to **View Options** and configure:
-    * **Sort By**: Click **Add** and select `_RowNumber` (Set to **Descending**).
+    * **Sort By**: Select `_RowNumber` (Set to **Descending**).
     * **Group By**: Click **Add** and select `Style` (Set to **Descending**).
 
 ### 4. Action Setup (on your computer)
