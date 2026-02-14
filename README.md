@@ -24,8 +24,8 @@
 
 3.  **Interface Setup**
     * Click the **+ (plus)** button next to "Files" and select **HTML**.
-    * Name the file `index.html`.
-    * Paste the HTML code in this GitHub into this file and **click save again**.
+    * Name the file `index`.
+    * Delete any existing code and paste in the HTML code in this GitHub into this file and **click save again**. Remember, YOU MUST DELETE THE EXISTING CODE!!!
 
 4.  **Permissions**
     * **Reload** your Google Sheet. You will see a new **Recorder** button on the top menu.
@@ -37,7 +37,7 @@
 5.  **Final Steps**
     * Complete the initial setup by selecting the folders you created in Step 1.
     * Delete **Sheet1**
-    * In the **SpeechTracker** sheet,
+    * In the **Speech Tracker** sheet,
         * Select all cells (`Cmd + A` or `Ctrl + A`).
         * Go to **Format** > **Wrapping** > **Wrap**.
         * Go to **Format** > **Alignment** > **Top**.
