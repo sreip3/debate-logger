@@ -7,6 +7,9 @@
 > [!WARNING]
 > **A Note on Security:** This code was generated with the full assistance of AI. While I guarantee that I haven't intentionally included anything malicious, you should always review and audit the code yourself before running it. Ultimately, the security of your account and data is your responsibility—give it a look over!
 
+> [!NOTE]
+> **Important:** So far, the application through testing mainly works on Google Chrome! So if you use another browser, some of the features might not work.
+
 1.  **Google Drive Setup**
     * Create **one main folder** to house your project.
     * Inside that folder, create **three sub-folders** named:
